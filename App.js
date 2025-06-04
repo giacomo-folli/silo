@@ -1,9 +1,101 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, PanResponder, Keyboard } from 'react-native';
 
 const ARCHIVE_STORAGE_KEY = 'silo_notes_archive';
 const STORAGE_KEY = 'silo_note'; // Added STORAGE_KEY definition
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 50, // Add padding at the top for better spacing
+    paddingHorizontal: 20,
+  },
+  editorContainer: {
+    flex: 1,
+  },
+  noteInput: {
+    flex: 1,
+    fontSize: 16,
+    backgroundColor: '#FFFFFF',
+    lineHeight: 22,
+    color: '#333',
+    textAlignVertical: 'top', // Align text to the top on Android
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  actionButton: {
+    padding: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  wordCountContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    alignItems: 'flex-end',
+    backgroundColor: '#f0f0f0', // Match container background
+  },
+  wordCountText: {
+    fontSize: 12,
+    color: '#555',
+  },
+  archiveContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  archiveTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  archivedNoteItem: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row', // Arrange text and delete button in a row
+    justifyContent: 'space-between', // Space out text and button
+    alignItems: 'center', // Vertically center items
+  },
+  archivedNoteText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  backButton: {
+    marginTop: 20,
+    padding: 10,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 14,
+    color: '#007AFF',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginLeft: 10, // Add space between text and delete button
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});
 
 export default function App() {
   const [currentNote, setCurrentNote] = useState('');
@@ -72,6 +164,20 @@ export default function App() {
     saveData();
   }, [currentNote, archivedNotes]);
 
+  // PanResponder for slide down gesture
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+        // Activate pan responder if the swipe is primarily downwards
+        return gestureState.dy > 10 && Math.abs(gestureState.dx) < 20;
+      },
+      onPanResponderEnd: (evt, gestureState) => {
+        // Dismiss the keyboard on a downward slide gesture
+        if (gestureState.vy > 0.5) Keyboard.dismiss();
+      },
+    })
+  ).current;
+
   // Render the UI based on whether the archive is being shown
   if (showArchive) {
     return (
@@ -96,101 +202,9 @@ export default function App() {
     );
   }
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#FFFFFF',
-      paddingTop: 50, // Add padding at the top for better spacing
-      paddingHorizontal: 20,
-    },
-    editorContainer: {
-      flex: 1,
-    },
-    noteInput: {
-      flex: 1,
-      fontSize: 16,
-      backgroundColor: '#FFFFFF',
-      lineHeight: 22,
-      color: '#333',
-      textAlignVertical: 'top', // Align text to the top on Android
-    },
-    buttonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingVertical: 10,
-      borderTopWidth: 1,
-      borderTopColor: '#eee',
-    },
-    actionButton: {
-      padding: 10,
-      backgroundColor: '#007AFF',
-      borderRadius: 5,
-    },
-    actionButtonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-    },
-    wordCountContainer: {
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      alignItems: 'flex-end',
-      backgroundColor: '#f0f0f0', // Match container background
-    },
-    wordCountText: {
-      fontSize: 12,
-      color: '#555',
-    },
-    archiveContainer: {
-      flex: 1,
-      backgroundColor: '#FFFFFF',
-      paddingTop: 50,
-      paddingHorizontal: 20,
-    },
-    archiveTitle: {
-      fontSize: 18,
-      marginBottom: 10,
-      fontWeight: 'bold',
-      color: '#333',
-    },
-    archivedNoteItem: {
-      paddingVertical: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: '#EEEEEE',
-      backgroundColor: '#FFFFFF',
-      flexDirection: 'row', // Arrange text and delete button in a row
-      justifyContent: 'space-between', // Space out text and button
-      alignItems: 'center', // Vertically center items
-    },
-    archivedNoteText: {
-      fontSize: 14,
-      color: '#333',
-    },
-    backButton: {
-      marginTop: 20,
-      padding: 10,
-      alignItems: 'center',
-    },
-    backButtonText: {
-      fontSize: 14,
-      color: '#007AFF',
-    },
-    deleteButton: {
-      backgroundColor: 'red',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 15,
-      borderRadius: 5,
-      marginLeft: 10, // Add space between text and delete button
-    },
-    deleteButtonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-    },
-  });
-
   // Render the main editor view
   return (
-    <View style={styles.container}>
+    <View style={styles.container} {...panResponder.panHandlers} >
       <TextInput
         style={styles.noteInput}
         multiline
