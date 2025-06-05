@@ -1,4 +1,4 @@
-import NotePage from "@/components/pages/NotePage";
+import { NotePage } from "@/screens";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import debounce from 'lodash/debounce';
 import React, { useCallback, useEffect, useState } from 'react';

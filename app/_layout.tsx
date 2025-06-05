@@ -3,8 +3,8 @@ import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import App from '@/App';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import App from '../App.js'; // Assuming App.js is in the root directory
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

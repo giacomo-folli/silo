@@ -1,6 +1,6 @@
-import { styles } from "@/styles/styles";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { styles } from "@/utils/styles/styles";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { IconSymbol } from "../ui/IconSymbol";
 
 interface ArchivePageProps {
   archivedNotes: any[]; // TODO: fix this type

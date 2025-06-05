@@ -1,5 +1,5 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { styles } from "@/styles/styles";
+import { styles } from "@/utils/styles/styles";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 interface NotePageProps {

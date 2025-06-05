@@ -1,6 +1,6 @@
+import { ArchivePage } from "@/screens";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import ArchivePage from "./ArchivePage";
 
 const ARCHIVE_STORAGE_KEY = 'silo_notes_archive';
 
