@@ -2,8 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { debounce, DebouncedFunc } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Keyboard, PanResponder } from 'react-native';
+import { Keyboard } from 'react-native';
 import NotePage from "../components/NotePage";
+import DismissKeyboardOnScroll from "./DismissKeyboardOnScroll";
 
 const STORAGE_KEY = 'silo_note';
 
@@ -92,29 +93,20 @@ export default function EditorPage({ archivedNotes, setArchivedNotes }: EditorPa
     loadData();
   }, []);
 
-  // PanResponder for slide down gesture
-  const panResponder = React.useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        return gestureState.dy > 10 && Math.abs(gestureState.dx) < 20;
-      },
-      onPanResponderEnd: (evt, gestureState) => {
-        if (gestureState.vy > 0.5) Keyboard.dismiss();
-      },
-    })
-  ).current;
+
 
   return (
-    <NotePage
-      currentNote={currentNote}
-      setCurrentNote={updateNote}
-      wordCount={wordCount}
-      archiveNote={archiveNote}
-      toggleArchive={() => router.push('/(tabs)/archive')}
-      panResponder={panResponder}
-      saveStatus={saveStatus}
-      isEditingArchivedNote={editingArchivedNoteId !== null}
-      startNewNote={startNewNote}
-    />
+    <DismissKeyboardOnScroll>
+      <NotePage
+        currentNote={currentNote}
+        setCurrentNote={updateNote}
+        wordCount={wordCount}
+        archiveNote={archiveNote}
+        toggleArchive={() => router.push('/(tabs)/archive')}
+        saveStatus={saveStatus}
+        isEditingArchivedNote={editingArchivedNoteId !== null}
+        startNewNote={startNewNote}
+      />
+    </DismissKeyboardOnScroll>
   );
 } 

@@ -1,4 +1,4 @@
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
 import { IconSymbol } from "../components/ui/IconSymbol";
 import { styles } from "../utils/styles/styles";
 
@@ -8,7 +8,7 @@ interface NotePageProps {
   wordCount: number;
   archiveNote: () => void;
   toggleArchive: () => void;
-  panResponder: any; // TODO: fix this type
+  panResponder?: any; // TODO: fix this type
   saveStatus: 'saved' | 'saving' | 'error';
   isEditingArchivedNote: boolean;
   startNewNote: () => void;
@@ -39,17 +39,24 @@ export default function NotePage({
   };
 
   const saveIcon = getSaveStatusIcon();
-
+  
   return (
-    <View style={styles.container} {...panResponder.panHandlers} >
-      <TextInput
-        style={styles.noteInput}
-        multiline
-        placeholder="Write your note here..."
-        value={currentNote}
-        onChangeText={setCurrentNote}
-        textAlignVertical='top' // Ensure text starts at the top
-      />
+    <View style={styles.container} {...panResponder?.panHandlers}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        keyboardDismissMode="interactive"
+        keyboardShouldPersistTaps="handled"
+      >
+        <TextInput
+          style={styles.noteInput}
+          multiline
+          placeholder="Write your note here..."
+          value={currentNote}
+          onChangeText={setCurrentNote}
+          textAlignVertical='top'
+          scrollEnabled={false}
+        />
+      </ScrollView>
       <View style={styles.wordCountContainer}>
         <View style={styles.saveStatusContainer}>
           <IconSymbol
