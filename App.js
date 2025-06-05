@@ -1,6 +1,7 @@
 import NotePage from "@/components/pages/NotePage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
+import debounce from 'lodash/debounce';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Keyboard, PanResponder } from 'react-native';
 import ArchivePage from "./components/pages/ArchivePage";
 
@@ -11,7 +12,29 @@ export default function App() {
   const [currentNote, setCurrentNote] = useState('');
   const [archivedNotes, setArchivedNotes] = useState([]);
   const [showArchive, setShowArchive] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'error'
   const wordCount = currentNote.trim().split(/\s+/).filter(word => word.length > 0).length;
+
+  // Debounced save function
+  const debouncedSave = useCallback(
+    debounce(async (note) => {
+      try {
+        setSaveStatus('saving');
+        await AsyncStorage.setItem(STORAGE_KEY, note);
+        setSaveStatus('saved');
+      } catch (e) {
+        console.error('Failed to save note', e);
+        setSaveStatus('error');
+      }
+    }, 1000),
+    []
+  );
+
+  // Update current note with debounced save
+  const updateNote = (note) => {
+    setCurrentNote(note);
+    debouncedSave(note);
+  };
 
   // Function to move the current note to the archive
   const archiveNote = () => {
@@ -59,20 +82,17 @@ export default function App() {
     loadData();
   }, []);
 
-  // Effect to save current note and archived notes to storage whenever they change
+  // Effect to save archived notes to storage whenever they change
   useEffect(() => {
-    const saveData = async () => {
+    const saveArchivedNotes = async () => {
       try {
-        // Save current note
-        await AsyncStorage.setItem(STORAGE_KEY, currentNote);
-        // Save archived notes
         await AsyncStorage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(archivedNotes));
       } catch (e) {
-        console.error('Failed to save data to storage', e);
+        console.error('Failed to save archived notes', e);
       }
     };
-    saveData();
-  }, [currentNote, archivedNotes]);
+    saveArchivedNotes();
+  }, [archivedNotes]);
 
   // PanResponder for slide down gesture
   const panResponder = React.useRef(
@@ -104,11 +124,12 @@ export default function App() {
   return (
     <NotePage
       currentNote={currentNote}
-      setCurrentNote={setCurrentNote}
+      setCurrentNote={updateNote}
       wordCount={wordCount}
       archiveNote={archiveNote}
       toggleArchive={toggleArchive}
       panResponder={panResponder}
+      saveStatus={saveStatus}
     />
   );
 

@@ -40,6 +40,14 @@ export const styles = StyleSheet.create({
       paddingVertical: 10,
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    saveStatusContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    saveStatusIcon: {
+      marginRight: 4,
     },
     wordCountText: {
       fontSize: 12,
