@@ -2,9 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { debounce, DebouncedFunc } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Keyboard } from 'react-native';
 import NotePage from "../components/NotePage";
-import DismissKeyboardOnScroll from "./DismissKeyboardOnScroll";
+import GestureHandler from "./GestureHandler";
 
 const STORAGE_KEY = 'silo_note';
 
@@ -110,11 +109,19 @@ export default function EditorPage({ archivedNotes, setArchivedNotes }: EditorPa
       startNewNote();
     }
   }, [editingArchivedNoteId, startNewNote]);
+  
+  // Handle swipe down to dismiss keyboard
+  const handleSwipeDown = useCallback(() => {
+    // Additional swipe down handling if needed
+    console.log('Swiped down');
+  }, []);
 
   return (
-    <DismissKeyboardOnScroll 
+    <GestureHandler 
       onSwipeLeft={handleSwipeLeft}
       onSwipeRight={handleSwipeRight}
+      onSwipeDown={handleSwipeDown}
+      dismissKeyboardOnSwipeDown={true}
     >
       <NotePage
         currentNote={currentNote}
@@ -126,6 +133,6 @@ export default function EditorPage({ archivedNotes, setArchivedNotes }: EditorPa
         isEditingArchivedNote={editingArchivedNoteId !== null}
         startNewNote={startNewNote}
       />
-    </DismissKeyboardOnScroll>
+    </GestureHandler>
   );
 } 
