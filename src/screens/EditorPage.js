@@ -1,10 +1,13 @@
 import { NotePage } from "@/screens";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import debounce from 'lodash/debounce';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, PanResponder } from 'react-native';
 
 const STORAGE_KEY = 'silo_note';
+
+// Create debounced save function outside component
+const createDebouncedSave = (callback) => debounce(callback, 1000);
 
 export default function EditorPage({ onNavigateToArchive, onArchiveNote, archivedNotes, setArchivedNotes }) {
   const [currentNote, setCurrentNote] = useState('');
@@ -12,38 +15,44 @@ export default function EditorPage({ onNavigateToArchive, onArchiveNote, archive
   const [editingArchivedNoteId, setEditingArchivedNoteId] = useState(null);
   const wordCount = currentNote.trim().split(/\s+/).filter(word => word.length > 0).length;
 
-  // Debounced save function
-  const debouncedSave = useCallback(
-    debounce(async (note) => {
-      try {
-        setSaveStatus('saving');
-        if (editingArchivedNoteId !== null) {
-          // Update the archived note
-          setArchivedNotes(prevNotes => 
-            prevNotes.map(note => 
-              note.id === editingArchivedNoteId 
-                ? { ...note, content: currentNote }
-                : note
-            )
-          );
-        } else {
-          // Save as current note
-          await AsyncStorage.setItem(STORAGE_KEY, note);
-        }
-        setSaveStatus('saved');
-      } catch (e) {
-        console.error('Failed to save note', e);
-        setSaveStatus('error');
+  // Create a stable reference to the save function
+  const saveFunction = useCallback(async (note) => {
+    try {
+      setSaveStatus('saving');
+      if (editingArchivedNoteId !== null) {
+        // Update the archived note
+        setArchivedNotes(prevNotes => 
+          prevNotes.map(note => 
+            note.id === editingArchivedNoteId 
+              ? { ...note, content: currentNote }
+              : note
+          )
+        );
+      } else {
+        // Save as current note
+        await AsyncStorage.setItem(STORAGE_KEY, note);
       }
-    }, 1000),
-    [editingArchivedNoteId, currentNote, setArchivedNotes]
-  );
+      setSaveStatus('saved');
+    } catch (e) {
+      console.error('Failed to save note', e);
+      setSaveStatus('error');
+    }
+  }, [editingArchivedNoteId, currentNote, setArchivedNotes]);
+
+  // Create a stable debounced save function
+  const debouncedSaveRef = useRef(null);
+  useEffect(() => {
+    debouncedSaveRef.current = createDebouncedSave(saveFunction);
+    return () => {
+      debouncedSaveRef.current?.cancel();
+    };
+  }, [saveFunction]);
 
   // Update current note with debounced save
-  const updateNote = (note) => {
+  const updateNote = useCallback((note) => {
     setCurrentNote(note);
-    debouncedSave(note);
-  };
+    debouncedSaveRef.current?.(note);
+  }, []);
 
   // Function to start a new note
   const startNewNote = () => {
