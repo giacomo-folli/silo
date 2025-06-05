@@ -95,8 +95,27 @@ export default function EditorPage({ archivedNotes, setArchivedNotes }: EditorPa
 
 
 
+  // Handle swipe to archive
+  const handleSwipeLeft = useCallback(() => {
+    // Only navigate to archive if we're not already viewing an archived note
+    if (editingArchivedNoteId === null) {
+      router.push('/(tabs)/archive');
+    }
+  }, [editingArchivedNoteId, router]);
+
+  // Handle swipe right from archive (navigate back to editor)
+  const handleSwipeRight = useCallback(() => {
+    // If we're viewing an archived note, go back to the editor
+    if (editingArchivedNoteId !== null) {
+      startNewNote();
+    }
+  }, [editingArchivedNoteId, startNewNote]);
+
   return (
-    <DismissKeyboardOnScroll>
+    <DismissKeyboardOnScroll 
+      onSwipeLeft={handleSwipeLeft}
+      onSwipeRight={handleSwipeRight}
+    >
       <NotePage
         currentNote={currentNote}
         setCurrentNote={updateNote}
