@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ArchivePage, ArchivedNote } from "../components";
+import ArchivePage, { ArchivedNote } from "./ArchivePage";
 
 const ARCHIVE_STORAGE_KEY = 'silo_notes_archive';
 
