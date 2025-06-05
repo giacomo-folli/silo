@@ -51,10 +51,10 @@ export default function ArchivePageWrapper({ onLoadArchivedNote }: ArchivePageWr
       archivedNotes={archivedNotes}
       loadArchivedNote={(note) => {
         onLoadArchivedNote(note);
-        router.push('/(tabs)/editor');
+        router.push('/(tabs)');
       }}
       deleteNote={deleteNote}
-      toggleArchive={() => router.push('/(tabs)/editor')}
+      toggleArchive={() => router.push('/(tabs)')}
     />
   );
 } 

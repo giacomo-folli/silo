@@ -5,9 +5,8 @@ const TabLayout = () => {
   return (
     <Tabs
       screenOptions={{
-        tabBarShowLabel: true,
         headerShown: false,
-        tabBarActiveTintColor: '#0a7ea4',
+        tabBarStyle: { display: 'none' },
       }}
     >
       <Tabs.Screen name="index" />
