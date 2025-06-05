@@ -91,7 +91,8 @@ export const styles = StyleSheet.create({
       backgroundColor: 'red',
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 15,
+      paddingHorizontal: 5,
+      paddingVertical: 5,
       borderRadius: 5,
       marginLeft: 10, // Add space between text and delete button
     },

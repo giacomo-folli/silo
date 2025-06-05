@@ -1,6 +1,4 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { styles } from "@/styles/styles";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -12,6 +10,8 @@ interface NotePageProps {
   toggleArchive: () => void;
   panResponder: any; // TODO: fix this type
   saveStatus: 'saved' | 'saving' | 'error';
+  isEditingArchivedNote: boolean;
+  startNewNote: () => void;
 }
 
 export default function NotePage({ 
@@ -21,21 +21,20 @@ export default function NotePage({
   archiveNote, 
   toggleArchive, 
   panResponder,
-  saveStatus 
+  saveStatus,
+  isEditingArchivedNote,
+  startNewNote
 }: NotePageProps) {
-  const theme = useColorScheme() ?? 'light';
-  const iconColor = theme === 'light' ? Colors.light.icon : Colors.dark.icon;
-
   const getSaveStatusIcon = () => {
     switch (saveStatus) {
       case 'saved':
-        return { name: 'checkmark.circle.fill', color: '#4CAF50' };
+        return { name: 'checkmark.circle.fill'};
       case 'saving':
-        return { name: 'clock.fill', color: iconColor };
+        return { name: 'clock.fill' };
       case 'error':
-        return { name: 'exclamationmark.circle.fill', color: '#F44336' };
+        return { name: 'exclamationmark.circle.fill' };
       default:
-        return { name: 'checkmark.circle.fill', color: iconColor };
+        return { name: 'checkmark.circle.fill' };
     }
   };
 
@@ -65,9 +64,15 @@ export default function NotePage({
         </Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={archiveNote} style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Archive Note</Text>
-        </TouchableOpacity>
+        {isEditingArchivedNote ? (
+          <TouchableOpacity onPress={startNewNote} style={styles.actionButton}>
+            <Text style={styles.actionButtonText}>New Note</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={archiveNote} style={styles.actionButton}>
+            <Text style={styles.actionButtonText}>Archive Note</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity onPress={toggleArchive} style={styles.actionButton}>
           <Text style={styles.actionButtonText}>View Archive</Text>
         </TouchableOpacity>

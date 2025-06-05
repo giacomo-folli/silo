@@ -13,6 +13,7 @@ export default function App() {
   const [archivedNotes, setArchivedNotes] = useState([]);
   const [showArchive, setShowArchive] = useState(false);
   const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'error'
+  const [editingArchivedNoteId, setEditingArchivedNoteId] = useState(null);
   const wordCount = currentNote.trim().split(/\s+/).filter(word => word.length > 0).length;
 
   // Debounced save function
@@ -20,14 +21,26 @@ export default function App() {
     debounce(async (note) => {
       try {
         setSaveStatus('saving');
-        await AsyncStorage.setItem(STORAGE_KEY, note);
+        if (editingArchivedNoteId !== null) {
+          // Update the archived note
+          setArchivedNotes(prevNotes => 
+            prevNotes.map(note => 
+              note.id === editingArchivedNoteId 
+                ? { ...note, content: currentNote }
+                : note
+            )
+          );
+        } else {
+          // Save as current note
+          await AsyncStorage.setItem(STORAGE_KEY, note);
+        }
         setSaveStatus('saved');
       } catch (e) {
         console.error('Failed to save note', e);
         setSaveStatus('error');
       }
     }, 1000),
-    []
+    [editingArchivedNoteId, currentNote]
   );
 
   // Update current note with debounced save
@@ -39,8 +52,10 @@ export default function App() {
   // Function to move the current note to the archive
   const archiveNote = () => {
     if (currentNote.trim().length > 0) {
-      setArchivedNotes([...archivedNotes, { id: Date.now(), content: currentNote }]);
+      const newNote = { id: Date.now(), content: currentNote };
+      setArchivedNotes([...archivedNotes, newNote]);
       setCurrentNote('');
+      setEditingArchivedNoteId(null);
     }
   };
 
@@ -53,8 +68,14 @@ export default function App() {
   // Function to load an archived note back into the editor
   const loadArchivedNote = (note) => {
     setCurrentNote(note.content);
-    setArchivedNotes(archivedNotes.filter(item => item.id !== note.id));
+    setEditingArchivedNoteId(note.id);
     setShowArchive(false);
+  };
+
+  // Function to start a new note
+  const startNewNote = () => {
+    setCurrentNote('');
+    setEditingArchivedNoteId(null);
   };
 
   // Function to toggle between the editor and the archive view
@@ -130,6 +151,8 @@ export default function App() {
       toggleArchive={toggleArchive}
       panResponder={panResponder}
       saveStatus={saveStatus}
+      isEditingArchivedNote={editingArchivedNoteId !== null}
+      startNewNote={startNewNote}
     />
   );
 
