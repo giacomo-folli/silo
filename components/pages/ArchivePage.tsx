@@ -19,8 +19,7 @@ export default function ArchivePage({ archivedNotes, loadArchivedNote, deleteNot
             <Text style={styles.archivedNoteText}>{note.content.substring(0, 45)}...</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => deleteNote(note.id)} style={styles.deleteButton}>
-{/*             <Text style={styles.deleteButtonText}>Delete</Text>
- */}            <IconSymbol name="trash" size={16} color="white" />
+            <IconSymbol name="trash" size={16} color="white" />
           </TouchableOpacity>
         </View>
       ))}
