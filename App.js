@@ -1,101 +1,11 @@
+import NotePage from "@/components/pages/NotePage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, PanResponder, Keyboard } from 'react-native';
+import { Keyboard, PanResponder } from 'react-native';
+import ArchivePage from "./components/pages/ArchivePage";
 
 const ARCHIVE_STORAGE_KEY = 'silo_notes_archive';
-const STORAGE_KEY = 'silo_note'; // Added STORAGE_KEY definition
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 50, // Add padding at the top for better spacing
-    paddingHorizontal: 20,
-  },
-  editorContainer: {
-    flex: 1,
-  },
-  noteInput: {
-    flex: 1,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
-    lineHeight: 22,
-    color: '#333',
-    textAlignVertical: 'top', // Align text to the top on Android
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  actionButton: {
-    padding: 10,
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
-  },
-  actionButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  wordCountContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    alignItems: 'flex-end',
-    backgroundColor: '#f0f0f0', // Match container background
-  },
-  wordCountText: {
-    fontSize: 12,
-    color: '#555',
-  },
-  archiveContainer: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-  },
-  archiveTitle: {
-    fontSize: 18,
-    marginBottom: 10,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  archivedNoteItem: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
-    backgroundColor: '#FFFFFF',
-    flexDirection: 'row', // Arrange text and delete button in a row
-    justifyContent: 'space-between', // Space out text and button
-    alignItems: 'center', // Vertically center items
-  },
-  archivedNoteText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  backButton: {
-    marginTop: 20,
-    padding: 10,
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 14,
-    color: '#007AFF',
-  },
-  deleteButton: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginLeft: 10, // Add space between text and delete button
-  },
-  deleteButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
+const STORAGE_KEY = 'silo_note'; // Added STORAGE_KEY definition  
 
 export default function App() {
   const [currentNote, setCurrentNote] = useState('');
@@ -181,50 +91,25 @@ export default function App() {
   // Render the UI based on whether the archive is being shown
   if (showArchive) {
     return (
-      <View style={styles.archiveContainer}>
-        <Text style={styles.archiveTitle}>Archived Notes</Text>
-        <ScrollView>
-          {archivedNotes.map((note) => (
-            <View key={note.id} style={styles.archivedNoteItem}>
-              <TouchableOpacity onPress={() => loadArchivedNote(note)}>
-                <Text style={styles.archivedNoteText}>{note.content.substring(0, 100)}...</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => deleteNote(note.id)} style={styles.deleteButton}>
-                <Text style={styles.deleteButtonText}>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
-        <TouchableOpacity onPress={toggleArchive} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Back to Editor</Text>
-        </TouchableOpacity>
-      </View>
+      <ArchivePage
+        archivedNotes={archivedNotes}
+        loadArchivedNote={loadArchivedNote}
+        deleteNote={deleteNote}
+        toggleArchive={toggleArchive}
+      />
     );
   }
 
   // Render the main editor view
   return (
-    <View style={styles.container} {...panResponder.panHandlers} >
-      <TextInput
-        style={styles.noteInput}
-        multiline
-        placeholder="Write your note here..."
-        value={currentNote}
-        onChangeText={setCurrentNote}
-        textAlignVertical='top' // Ensure text starts at the top
-      />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={archiveNote} style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Archive Note</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={toggleArchive} style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>View Archive</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.wordCountContainer}>
-        <Text style={styles.wordCountText}>Word Count: {wordCount}</Text>
-      </View>
-    </View>
+    <NotePage
+      currentNote={currentNote}
+      setCurrentNote={setCurrentNote}
+      wordCount={wordCount}
+      archiveNote={archiveNote}
+      toggleArchive={toggleArchive}
+      panResponder={panResponder}
+    />
   );
 
 }
