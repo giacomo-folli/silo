@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { debounce, DebouncedFunc } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import NotePage from "../components/NotePage";
-import GestureHandler from "./GestureHandler";
 
 const STORAGE_KEY = 'silo_note';
 
@@ -17,7 +16,7 @@ interface EditorPageProps {
 }
 
 export default function EditorPage({ archivedNotes, setArchivedNotes }: EditorPageProps) {
-  const router = useRouter();
+
   const [currentNote, setCurrentNote] = useState('');
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
   const [editingArchivedNoteId, setEditingArchivedNoteId] = useState<number | null>(null);
@@ -94,45 +93,18 @@ export default function EditorPage({ archivedNotes, setArchivedNotes }: EditorPa
 
 
 
-  // Handle swipe to archive
-  const handleSwipeLeft = useCallback(() => {
-    // Only navigate to archive if we're not already viewing an archived note
-    if (editingArchivedNoteId === null) {
-      router.push('/(tabs)/archive');
-    }
-  }, [editingArchivedNoteId, router]);
 
-  // Handle swipe right from archive (navigate back to editor)
-  const handleSwipeRight = useCallback(() => {
-    // If we're viewing an archived note, go back to the editor
-    if (editingArchivedNoteId !== null) {
-      startNewNote();
-    }
-  }, [editingArchivedNoteId, startNewNote]);
-  
-  // Handle swipe down to dismiss keyboard
-  const handleSwipeDown = useCallback(() => {
-    // Additional swipe down handling if needed
-    console.log('Swiped down');
-  }, []);
 
   return (
-    <GestureHandler 
-      onSwipeLeft={handleSwipeLeft}
-      onSwipeRight={handleSwipeRight}
-      onSwipeDown={handleSwipeDown}
-      dismissKeyboardOnSwipeDown={true}
-    >
-      <NotePage
-        currentNote={currentNote}
-        setCurrentNote={updateNote}
-        wordCount={wordCount}
-        archiveNote={archiveNote}
-        toggleArchive={() => router.push('/(tabs)/archive')}
-        saveStatus={saveStatus}
-        isEditingArchivedNote={editingArchivedNoteId !== null}
-        startNewNote={startNewNote}
-      />
-    </GestureHandler>
+    <NotePage
+      currentNote={currentNote}
+      setCurrentNote={updateNote}
+      wordCount={wordCount}
+      archiveNote={archiveNote}
+      toggleArchive={() => router.push('/(tabs)/archive')}
+      saveStatus={saveStatus}
+      isEditingArchivedNote={editingArchivedNoteId !== null}
+      startNewNote={startNewNote}
+    />
   );
 } 

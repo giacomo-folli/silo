@@ -1,8 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import ArchivePage, { ArchivedNote } from "./ArchivePage";
-import GestureHandler from "./GestureHandler";
 
 const ARCHIVE_STORAGE_KEY = 'silo_notes_archive';
 
@@ -11,7 +10,7 @@ interface ArchivePageWrapperProps {
 }
 
 export default function ArchivePageWrapper({ onLoadArchivedNote }: ArchivePageWrapperProps) {
-  const router = useRouter();
+
   const [archivedNotes, setArchivedNotes] = useState<ArchivedNote[]>([]);
 
   // Function to delete a note from the archive
@@ -47,28 +46,18 @@ export default function ArchivePageWrapper({ onLoadArchivedNote }: ArchivePageWr
     saveArchivedNotes();
   }, [archivedNotes]);
 
-  // Handle swipe right to go back to home
-  const handleSwipeRight = useCallback(() => {
-    router.push('/(tabs)');
-  }, [router]);
-
-  // Handle loading an archived note and navigating back to home
+  // Handle loading an archived note
   const handleLoadArchivedNote = useCallback((note: ArchivedNote) => {
     onLoadArchivedNote(note);
     router.push('/(tabs)');
   }, [onLoadArchivedNote, router]);
 
   return (
-    <GestureHandler 
-      onSwipeRight={handleSwipeRight}
-      dismissKeyboardOnSwipeDown={true}
-    >
-      <ArchivePage
-        archivedNotes={archivedNotes}
-        loadArchivedNote={handleLoadArchivedNote}
-        deleteNote={deleteNote}
-        toggleArchive={() => router.push('/(tabs)')}
-      />
-    </GestureHandler>
+    <ArchivePage
+      archivedNotes={archivedNotes}
+      loadArchivedNote={handleLoadArchivedNote}
+      deleteNote={deleteNote}
+      toggleArchive={() => router.push('/(tabs)')}
+    />
   );
 }
