@@ -1,14 +1,20 @@
-import { ArchivePage } from "@/screens";
+import ArchivePage, { ArchivedNote } from "@/components/ArchivePage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 
 const ARCHIVE_STORAGE_KEY = 'silo_notes_archive';
 
-export default function ArchivePageWrapper({ onNavigateToEditor, onLoadArchivedNote }) {
-  const [archivedNotes, setArchivedNotes] = useState([]);
+interface ArchivePageWrapperProps {
+  onLoadArchivedNote: (note: ArchivedNote) => void;
+}
+
+export default function ArchivePageWrapper({ onLoadArchivedNote }: ArchivePageWrapperProps) {
+  const router = useRouter();
+  const [archivedNotes, setArchivedNotes] = useState<ArchivedNote[]>([]);
 
   // Function to delete a note from the archive
-  const deleteNote = async (id) => {
+  const deleteNote = async (id: number) => {
     const updatedNotes = archivedNotes.filter(note => note.id !== id);
     setArchivedNotes(updatedNotes);
   };
@@ -45,10 +51,10 @@ export default function ArchivePageWrapper({ onNavigateToEditor, onLoadArchivedN
       archivedNotes={archivedNotes}
       loadArchivedNote={(note) => {
         onLoadArchivedNote(note);
-        onNavigateToEditor();
+        router.push('/(tabs)/editor');
       }}
       deleteNote={deleteNote}
-      toggleArchive={onNavigateToEditor}
+      toggleArchive={() => router.push('/(tabs)/editor')}
     />
   );
 } 

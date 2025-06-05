@@ -1,28 +1,36 @@
-import { NotePage } from "@/screens";
+import NotePage from "@/components/NotePage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import debounce from 'lodash/debounce';
+import { useRouter } from 'expo-router';
+import { debounce, DebouncedFunc } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, PanResponder } from 'react-native';
 
 const STORAGE_KEY = 'silo_note';
 
 // Create debounced save function outside component
-const createDebouncedSave = (callback) => debounce(callback, 1000);
+const createDebouncedSave = (callback: (note: string) => Promise<void>): DebouncedFunc<(note: string) => Promise<void>> => 
+  debounce(callback, 1000);
 
-export default function EditorPage({ onNavigateToArchive, onArchiveNote, archivedNotes, setArchivedNotes }) {
+interface EditorPageProps {
+  archivedNotes: { id: number; content: string }[];
+  setArchivedNotes: (notes: { id: number; content: string }[]) => void;
+}
+
+export default function EditorPage({ archivedNotes, setArchivedNotes }: EditorPageProps) {
+  const router = useRouter();
   const [currentNote, setCurrentNote] = useState('');
-  const [saveStatus, setSaveStatus] = useState('saved');
-  const [editingArchivedNoteId, setEditingArchivedNoteId] = useState(null);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [editingArchivedNoteId, setEditingArchivedNoteId] = useState<number | null>(null);
   const wordCount = currentNote.trim().split(/\s+/).filter(word => word.length > 0).length;
 
   // Create a stable reference to the save function
-  const saveFunction = useCallback(async (note) => {
+  const saveFunction = useCallback(async (note: string) => {
     try {
       setSaveStatus('saving');
       if (editingArchivedNoteId !== null) {
         // Update the archived note
-        setArchivedNotes(prevNotes => 
-          prevNotes.map(note => 
+        setArchivedNotes(
+          archivedNotes.map(note => 
             note.id === editingArchivedNoteId 
               ? { ...note, content: currentNote }
               : note
@@ -37,10 +45,10 @@ export default function EditorPage({ onNavigateToArchive, onArchiveNote, archive
       console.error('Failed to save note', e);
       setSaveStatus('error');
     }
-  }, [editingArchivedNoteId, currentNote, setArchivedNotes]);
+  }, [editingArchivedNoteId, currentNote, setArchivedNotes, archivedNotes]);
 
   // Create a stable debounced save function
-  const debouncedSaveRef = useRef(null);
+  const debouncedSaveRef = useRef<DebouncedFunc<(note: string) => Promise<void>> | null>(null);
   useEffect(() => {
     debouncedSaveRef.current = createDebouncedSave(saveFunction);
     return () => {
@@ -49,7 +57,7 @@ export default function EditorPage({ onNavigateToArchive, onArchiveNote, archive
   }, [saveFunction]);
 
   // Update current note with debounced save
-  const updateNote = useCallback((note) => {
+  const updateNote = useCallback((note: string) => {
     setCurrentNote(note);
     debouncedSaveRef.current?.(note);
   }, []);
@@ -58,6 +66,15 @@ export default function EditorPage({ onNavigateToArchive, onArchiveNote, archive
   const startNewNote = () => {
     setCurrentNote('');
     setEditingArchivedNoteId(null);
+  };
+
+  // Function to archive the current note
+  const archiveNote = () => {
+    if (currentNote.trim().length > 0) {
+      const newNote = { id: Date.now(), content: currentNote };
+      setArchivedNotes([...archivedNotes, newNote]);
+      setCurrentNote('');
+    }
   };
 
   // Effect to load data from storage on initial mount
@@ -92,8 +109,8 @@ export default function EditorPage({ onNavigateToArchive, onArchiveNote, archive
       currentNote={currentNote}
       setCurrentNote={updateNote}
       wordCount={wordCount}
-      archiveNote={onArchiveNote}
-      toggleArchive={onNavigateToArchive}
+      archiveNote={archiveNote}
+      toggleArchive={() => router.push('/(tabs)/archive')}
       panResponder={panResponder}
       saveStatus={saveStatus}
       isEditingArchivedNote={editingArchivedNoteId !== null}

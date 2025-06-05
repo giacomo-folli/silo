@@ -2,10 +2,15 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { styles } from "@/utils/styles/styles";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
+export interface ArchivedNote {
+  id: number;
+  content: string;
+}
+
 interface ArchivePageProps {
-  archivedNotes: any[]; // TODO: fix this type
-  loadArchivedNote: (note: any) => void;
-  deleteNote: (id: string) => void;
+  archivedNotes: ArchivedNote[];
+  loadArchivedNote: (note: ArchivedNote) => void;
+  deleteNote: (id: number) => void;
   toggleArchive: () => void;
 }
 
@@ -28,4 +33,4 @@ export default function ArchivePage({ archivedNotes, loadArchivedNote, deleteNot
       <Text style={styles.backButtonText}>Back to Editor</Text>
     </TouchableOpacity>
   </View>
-}
+} 

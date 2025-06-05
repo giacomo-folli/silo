@@ -1,3 +1,9 @@
+// Page components
+export { default as ArchivePage, ArchivedNote } from './ArchivePage';
+export { default as ArchivePageWrapper } from './ArchivePageWrapper';
+export { default as EditorPage } from './EditorPage';
+export { default as NotePage } from './NotePage';
+
 // Common components
 export * from './common/Collapsible';
 export * from './common/ExternalLink';
