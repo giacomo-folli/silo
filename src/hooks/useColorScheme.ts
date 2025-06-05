@@ -1,6 +1,7 @@
-import { Platform } from 'react-native';
+import { Platform, useColorScheme as useNativeColorScheme } from 'react-native';
+import { useColorScheme as useWebColorScheme } from './useColorScheme.web';
 
 export const useColorScheme = Platform.select({
-  web: () => require('./useColorScheme.web').useColorScheme,
-  default: () => require('react-native').useColorScheme,
+  web: () => useWebColorScheme,
+  default: () => useNativeColorScheme,
 })();

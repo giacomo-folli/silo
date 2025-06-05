@@ -60,7 +60,7 @@ export default function NotePage({
           />
         </View>
         <Text style={styles.wordCountText}>
-          {wordCount == 1 ? `${wordCount} word` : `${wordCount} words`}
+          {wordCount === 1 ? `${wordCount} word` : `${wordCount} words`}
         </Text>
       </View>
       <View style={styles.buttonContainer}>
