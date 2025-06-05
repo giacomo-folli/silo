@@ -1,6 +1,6 @@
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { styles } from "@/utils/styles/styles";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { IconSymbol } from "../components/ui/IconSymbol";
+import { styles } from "../utils/styles/styles";
 
 export interface ArchivedNote {
   id: number;

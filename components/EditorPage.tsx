@@ -1,9 +1,9 @@
-import NotePage from "@/components/NotePage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { debounce, DebouncedFunc } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, PanResponder } from 'react-native';
+import NotePage from "../components/NotePage";
 
 const STORAGE_KEY = 'silo_note';
 

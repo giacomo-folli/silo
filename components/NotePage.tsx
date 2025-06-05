@@ -1,6 +1,6 @@
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { styles } from "@/utils/styles/styles";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { IconSymbol } from "../components/ui/IconSymbol";
+import { styles } from "../utils/styles/styles";
 
 interface NotePageProps {
   currentNote: string;

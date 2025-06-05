@@ -1,5 +1,5 @@
-import ArchivePageWrapper from "@/components/ArchivePageWrapper";
 import React from 'react';
+import ArchivePageWrapper from "../../components/ArchivePageWrapper";
 
 export default function ArchiveTab() {
   return (
